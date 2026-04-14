@@ -1,17 +1,10 @@
 /**
- * @typedef {object} PostData
- * @property {string} title
- * @property {string} author
- * @property {string} date
- * @property {string} fileName
- */
-
-/**
  * @typedef {object} Post
  * @property {string} title
  * @property {string} author
  * @property {string} date
  * @property {string} text
+ * @property {string} fileName
  */
 
 // Get current page from ?page=... or default to 1
@@ -121,67 +114,84 @@ function createPaginationButtons(numPosts) {
 
 const _postsPerPage = 5;
 
+function getPosition(string, subString, index) {
+    return string.split(subString, index).join(subString).length;
+}
+
 function fetchPosts() {
     fetch('/posts.json')
         .then(r => r.json())
-        .then(postData => {
-            const content = document.getElementById('content');
+        .then(
+            /** @param {Post[]} postData */
+            postData => {
+                const content = document.getElementById('content');
 
-            /**
-             * @type {Post[]}
-             */
-            const posts = [];
-            const fetchPromises = [];
+                /**
+                 * @type {Post[]}
+                 */
+                const posts = [];
+                const fetchPromises = [];
 
-            // Pagination logic
-            const currentPage = getPageFromUrl();
-            const numPosts = postData.length;
-            const numPages = Math.ceil(numPosts / _postsPerPage);
+                // Pagination logic
+                const currentPage = getPageFromUrl();
+                const numPosts = postData.length;
+                const numPages = Math.ceil(numPosts / _postsPerPage);
 
-            const start = (currentPage - 1) * _postsPerPage;
-            const end = start + _postsPerPage;
+                const start = (currentPage - 1) * _postsPerPage;
+                const end = start + _postsPerPage;
 
-            // Sort all posts by date desc
-            postData.sort(postSorter);
+                // Sort all posts by date desc
+                postData.sort(postSorter);
 
-            // Grab slice of current page (already sorted)
-            const pagePosts = postData.slice(start, end);
+                // Grab slice of current page (already sorted)
+                const pagePosts = postData.slice(start, end);
 
-            // Get paginated posts' text and metadata
-            for (let i = 0; i < pagePosts.length; i++) {
-                const post = pagePosts[i];
-                fetchPromises.push(
-                    fetch('posts/' + post.fileName)
-                        .then(res => res.text())
-                        .then(text => {
-                            posts.push({ title: post.title, author: post.author, date: post.date, text: text });
-                        }));
-            }
+                // Get paginated posts' text and metadata
+                for (let i = 0; i < pagePosts.length; i++) {
+                    const post = pagePosts[i];
+                    fetchPromises.push(
+                        fetch('posts/' + post.fileName)
+                            .then(res => res.text())
+                            .then(text => {
+                                posts.push({ ...post, text: text });
+                            }));
+                }
 
-            Promise.all(fetchPromises)
-                .then(() => {
-                    // Sort again, as `posts` may have been fetched out-of-order
-                    posts.sort(postSorter);
+                Promise.all(fetchPromises)
+                    .then(() => {
+                        // Sort again, as `posts` may have been fetched out-of-order
+                        posts.sort(postSorter);
 
-                    // Remove 'Loading...'
-                    content.innerHTML = '';
+                        // Remove 'Loading...'
+                        content.innerHTML = '';
 
-                    // Render posts made for a single page
-                    for (let i = 0; i < posts.length; i++) {
-                        const post = posts[i];
+                        // Render posts made for a single page
+                        for (let i = 0; i < posts.length; i++) {
+                            const post = posts[i];
 
-                        // Initialize post text with title and date
-                        const postText = `#### ${post.title}\n\n<span style="color:gray"><small>${formatDateLocale(new Date(post.date))}${post.author ? ` • ${post.author}` : ''}</small></span>\n\n---\n${post.text}`;
+                            // Initialize post text with title and date
+                            const firstThreeLines = post.text.substring(0, getPosition(post.text, '\n', 3));
+                            const postText = `#### ${post.title}\n\n<span style="color:gray"><small>${formatDateLocale(new Date(post.date))}${post.author ? ` • ${post.author}` : ''}</small></span>\n\n---\n${firstThreeLines}`;
 
-                        const newDiv = document.createElement('div');
-                        newDiv.style.marginBottom = '40px';
-                        newDiv.innerHTML = marked.parse(postText);
+                            const postBlock = document.createElement('div');
+                            postBlock.style.marginBottom = '40px';
 
-                        content.appendChild(newDiv);
-                    }
+                            const newDiv = document.createElement('div');
+                            newDiv.innerHTML = marked.parse(postText);
+                            newDiv.classList.add("teaser__content");
 
-                    if (numPosts > 0)
-                        createPaginationButtons(numPosts);
-                });
-        });
+                            postBlock.appendChild(newDiv);
+
+                            const moreLink = document.createElement('a');
+                            moreLink.innerText = "More";
+                            moreLink.href = `#${post.fileName}`;
+                            postBlock.appendChild(moreLink);
+
+                            content.appendChild(postBlock);
+                        }
+
+                        if (numPosts > 0)
+                            createPaginationButtons(numPosts);
+                    });
+            });
 }

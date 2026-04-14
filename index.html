@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Scaevola Studios | Home</title>
 	<link href="bootstrap.min.css" rel="stylesheet">
+	<link href="site.css" rel="stylesheet">
 	<script src="marked.min.js"></script>
 	<script src="navbar.js"></script>
 	<script src="home.js"></script>
@@ -24,14 +25,24 @@
 			nav();
 		}
 
-		const pageName = window.location.hash
-			? window.location.hash.substring(1)
-			: 'home';
+		function evaluateWindowLocationHash(event) {
+			const pageName = window.location.hash
+				? window.location.hash.substring(1)
+				: 'home';
 
-		if (pageName === 'home')
-			home();
-		else
-			navPage(`${pageName}.html`);
+			if (pageName === 'home')
+				home();
+			else if (pageName.endsWith('md'))
+				navPostFromFileName(pageName);
+			else
+				navPage(`${pageName}.html`);
+		}
+
+		addEventListener("hashchange", (event) =>
+			evaluateWindowLocationHash(event));
+
+		// Initialize by loading hash change
+		evaluateWindowLocationHash();
 	</script>
 
 </body>
