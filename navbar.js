@@ -25,18 +25,6 @@ function navPage(fileName) {
 		.then(response => response.text())
 		.then(data => {
 			document.getElementById('content').innerHTML = data;
-
-			const currentPage = fileName.substring(0, fileName.indexOf('.')).toLowerCase();
-			const links = document.querySelectorAll('.nav-link');
-
-			// Highlight page
-			for (const link of links) {
-				if (link.id === currentPage) {
-					link.classList.add('active');
-				} else {
-					link.classList.remove('active');
-				}
-			}
 		});
 }
 
@@ -71,17 +59,5 @@ function navPost(post) {
 			moreLink.href = `#`;
 			moreLink.onclick = () => history.back();
 			content.appendChild(moreLink);
-
-			const links = document.querySelectorAll('.nav-link');
-
-			// Un-highlight pages
-			for (const link of links) {
-				link.classList.remove('active');
-			}
 		});
-}
-
-function home() {
-	navPage('home.html');
-	fetchPosts();
 }

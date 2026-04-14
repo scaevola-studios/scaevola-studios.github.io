@@ -39,15 +39,37 @@
 				: 'home';
 
 			if (pageName === 'home')
-				home();
+				fetchPosts();
 			else if (pageName.endsWith('md'))
 				navPostFromFileName(pageName);
 			else
 				navPage(`${pageName}.html`);
+
+			const links = document.querySelectorAll('.nav-link');
+
+			// Highlight page of nav
+			for (const link of links) {
+				if (link.id === pageName)
+					link.classList.add('active');
+				else
+					link.classList.remove('active');
+			}
 		}
 
 		addEventListener("hashchange", (event) =>
 			evaluateWindowLocationHash(event));
+
+		// re-fetch posts upon possible change of ?page= while at 'home'
+		window.navigation.addEventListener("navigate",
+			e => {
+				const url = new URL(e.destination.url);
+				const pageName = url.hash
+					? url.hash.substring(1)
+					: 'home';
+
+				if (pageName === 'home')
+					fetchPosts();
+			});
 
 		// Initialize by loading hash change
 		evaluateWindowLocationHash();

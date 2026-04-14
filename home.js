@@ -80,7 +80,6 @@ function createPaginationButtons(numPosts) {
         prev.querySelector('a').addEventListener('click', (e) => {
             e.preventDefault();
             setPage(currentPage - 1);
-            window.location.reload();
         });
     }
     el.appendChild(prev);
@@ -93,7 +92,6 @@ function createPaginationButtons(numPosts) {
             li.querySelector('a').addEventListener('click', (e) => {
                 e.preventDefault();
                 setPage(i);
-                window.location.reload();
             });
         }
         el.appendChild(li);
@@ -106,7 +104,6 @@ function createPaginationButtons(numPosts) {
         next.querySelector('a').addEventListener('click', (e) => {
             e.preventDefault();
             setPage(currentPage + 1);
-            window.location.reload();
         });
     }
     el.appendChild(next);
