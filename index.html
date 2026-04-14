@@ -12,13 +12,21 @@
 	<script src="home.js"></script>
 </head>
 
-<body class="bg-light">
+<body class="bg-light min-vh-100 d-flex flex-column">
 	<div id="navbar-container"></div>
-	<div class="container my-5">
+	<main class="flex-grow-1 container my-5">
 		<div id="content">Loading...</div>
-	</div>
+	</main>
+
+	<footer class="bg-dark text-light py-4 mt-auto">
+		<div class="container text-center">
+			<p>&copy; <span id="copyrightYear"></span> Scaevola Studios. All rights reserved.</p>
+		</div>
+	</footer>
 
 	<script>
+		document.getElementById("copyrightYear").innerText = new Date().getFullYear();
+
 		if (document.readyState === 'loading') {
 			document.addEventListener('DOMContentLoaded', nav);
 		} else {
