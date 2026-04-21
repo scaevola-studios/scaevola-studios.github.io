@@ -109,7 +109,7 @@ function createPaginationButtons(numPosts) {
     el.appendChild(next);
 }
 
-const _postsPerPage = 5;
+const _postsPerPage = 3;
 
 function getPosition(string, subString, index) {
     return string.split(subString, index).join(subString).length;
@@ -165,24 +165,35 @@ function fetchPosts() {
                         // Render posts made for a single page
                         for (let i = 0; i < posts.length; i++) {
                             const post = posts[i];
+                            const lineCount = i === 0 && currentPage <= 1
+                                ? 5
+                                : 3;
+                            const maxHeight = i === 0 && currentPage <= 1
+                                ? '500px'
+                                : '250px';
 
                             // Initialize post text with title and date
-                            const firstThreeLines = post.text.substring(0, getPosition(post.text, '\n', 3));
-                            const postText = `#### ${post.title}\n\n<span style="color:gray"><small>${formatDateLocale(new Date(post.date))}${post.author ? ` • ${post.author}` : ''}</small></span>\n\n---\n${firstThreeLines}`;
+                            const previewLines = post.text.substring(0, getPosition(post.text, '\n', lineCount));
+                            const postText = `#### ${post.title}\n\n<span style="color:gray"><small>${formatDateLocale(new Date(post.date))}${post.author ? ` • ${post.author}` : ''}</small></span>\n\n---\n${previewLines}`;
 
                             const postBlock = document.createElement('div');
                             postBlock.style.marginBottom = '40px';
 
                             const newDiv = document.createElement('div');
                             newDiv.innerHTML = marked.parse(postText);
-                            newDiv.classList.add("teaser__content");
+                            newDiv.style.maxHeight = maxHeight;
+                            newDiv.style.overflow = 'hidden';
 
                             postBlock.appendChild(newDiv);
 
-                            const moreLink = document.createElement('a');
-                            moreLink.innerText = "More";
-                            moreLink.href = `#${post.fileName}`;
-                            postBlock.appendChild(moreLink);
+                            if (previewLines !== post.text) {
+                                newDiv.classList.add("teaser__content");
+
+                                const moreLink = document.createElement('a');
+                                moreLink.innerText = "More";
+                                moreLink.href = `#${post.fileName}`;
+                                postBlock.appendChild(moreLink);
+                            }
 
                             content.appendChild(postBlock);
                         }
