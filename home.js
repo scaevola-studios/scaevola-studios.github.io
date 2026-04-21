@@ -121,6 +121,8 @@ function fetchPosts() {
         .then(
             /** @param {Post[]} postData */
             postData => {
+                document.title = "Home | Scaevola Studios";
+
                 const content = document.getElementById('content');
 
                 /**

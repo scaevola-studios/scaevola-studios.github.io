@@ -25,6 +25,26 @@ function navPage(fileName) {
 		.then(response => response.text())
 		.then(data => {
 			document.getElementById('content').innerHTML = data;
+
+			const afterHtml = data.match(/<\/html>\s*([\s\S]*)$/i)?.[1] ?? '';
+
+			// Pull out the last <script> block from that tail
+			const scriptMatch = afterHtml.match(/<script\b[^>]*>([\s\S]*?)<\/script>\s*$/i);
+			const scriptText = scriptMatch?.[1] ?? '';
+
+			// Add <script> to our <head> and remove the old one
+			if (scriptText) {
+				let old = document.getElementById('navPageScript');
+
+				if (old)
+					old.parentNode.removeChild(old)
+
+				const s = document.createElement('script');
+				s.id = "navPageScript";
+
+				s.textContent = scriptText;
+				document.head.appendChild(s);
+			}
 		});
 }
 
