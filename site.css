@@ -6,3 +6,14 @@
 .bg-sienna {
   background-color: #882D17;
 }
+
+.pagination {
+  --bs-pagination-color: #882D17;
+  --bs-pagination-bg: #fff;
+  --bs-pagination-hover-color: #fff;
+  --bs-pagination-hover-bg: #882D17;
+  --bs-pagination-hover-border-color: #882D17;
+  --bs-pagination-active-color: #fff;
+  --bs-pagination-active-bg: #882D17;
+  --bs-pagination-active-border-color: #882D17;
+}
